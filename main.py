@@ -5,6 +5,7 @@ import asyncio
 import json
 from pathlib import Path
 
+from miner_runtime.batch import run
 from renderer_client import RenderOptions, RenderRejected
 
 from sn17gen.pipeline import run as pipeline_run
@@ -56,8 +57,6 @@ async def _awaited(awaitable):
 
 
 async def main() -> None:
-    from miner.run import run
-
     parser = argparse.ArgumentParser(description=__doc__)
     inputs = parser.add_mutually_exclusive_group(required=True)
     inputs.add_argument("--prompts", type=Path, help="Text file with one image URL per line")
@@ -81,6 +80,7 @@ async def main() -> None:
         generate,
         {Path(source).stem: source for source in sources},
         args.seed,
+        witness_config=Path(__file__).resolve().with_name("witness.json"),
         workers=args.parallel_prompts,
         parallel_calls=args.parallel_calls,
         attempts=args.attempts,
